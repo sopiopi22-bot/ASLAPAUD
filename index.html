@@ -1,0 +1,501 @@
+import React, { useState } from "react";
+import {
+  Menu,
+  X,
+  Sun,
+  Cloud,
+  Heart,
+  Star,
+  Check,
+  GraduationCap,
+  ShieldCheck,
+  Smile,
+  MapPin,
+  Phone,
+  Instagram,
+  Facebook,
+  Youtube,
+  Sparkles,
+} from "lucide-react";
+
+/* ---------- Small doodle helpers (inline SVG, hand-drawn feel) ---------- */
+
+const DoodleSun = ({ className = "" }) => (
+  <svg viewBox="0 0 100 100" className={className} fill="none">
+    <circle cx="50" cy="50" r="18" stroke="#F58220" strokeWidth="4" />
+    {Array.from({ length: 8 }).map((_, i) => {
+      const angle = (i * Math.PI) / 4;
+      const x1 = 50 + Math.cos(angle) * 26;
+      const y1 = 50 + Math.sin(angle) * 26;
+      const x2 = 50 + Math.cos(angle) * 38;
+      const y2 = 50 + Math.sin(angle) * 38;
+      return (
+        <line
+          key={i}
+          x1={x1}
+          y1={y1}
+          x2={x2}
+          y2={y2}
+          stroke="#F58220"
+          strokeWidth="4"
+          strokeLinecap="round"
+        />
+      );
+    })}
+  </svg>
+);
+
+const DoodleCloud = ({ className = "" }) => (
+  <svg viewBox="0 0 120 70" className={className} fill="none">
+    <path
+      d="M25 55C13 55 5 47 5 37C5 27 13 20 22 20C24 10 33 3 44 3C54 3 62 9 65 18C67 17 70 17 72 17C85 17 95 27 95 39C95 51 85 55 73 55H25Z"
+      stroke="#A3D3E9"
+      strokeWidth="4"
+      strokeLinejoin="round"
+    />
+  </svg>
+);
+
+const DoodleHeart = ({ className = "" }) => (
+  <svg viewBox="0 0 100 90" className={className} fill="none">
+    <path
+      d="M50 85C50 85 8 58 8 30C8 14 20 5 33 5C42 5 48 10 50 17C52 10 58 5 67 5C80 5 92 14 92 30C92 58 50 85 50 85Z"
+      stroke="#F4B6D3"
+      strokeWidth="5"
+      strokeLinejoin="round"
+    />
+  </svg>
+);
+
+const DoodleStar = ({ className = "", color = "#F58220" }) => (
+  <svg viewBox="0 0 100 100" className={className} fill="none">
+    <path
+      d="M50 4 L61 38 L97 38 L68 59 L79 93 L50 72 L21 93 L32 59 L3 38 L39 38 Z"
+      stroke={color}
+      strokeWidth="4"
+      strokeLinejoin="round"
+    />
+  </svg>
+);
+
+/* ------------------------------- Data ------------------------------- */
+
+const NAV_LINKS = [
+  { label: "Tentang Kami", href: "#tentang" },
+  { label: "Kurikulum", href: "#kurikulum" },
+  { label: "Jadwal", href: "#jadwal" },
+  { label: "Fasilitas", href: "#fasilitas" },
+  { label: "PPDB", href: "#ppdb" },
+  { label: "Kontak", href: "#kontak" },
+];
+
+const HIGHLIGHTS = [
+  {
+    icon: GraduationCap,
+    bg: "bg-sky-200",
+    title: "Pengajar Islami & Berkompeten",
+    desc: "Guru yang sabar, berpengalaman, dan mendidik dengan keteladanan.",
+  },
+  {
+    icon: Heart,
+    bg: "bg-pink-200",
+    title: "Fokus Adab & Akhlak",
+    desc: "Menanamkan rasa cinta kepada Allah, Rasulullah, dan adab sehari-hari sejak dini.",
+  },
+  {
+    icon: ShieldCheck,
+    bg: "bg-orange-400",
+    title: "Lingkungan Aman & Stimulatif",
+    desc: "Fasilitas bersih, aman, dan mendukung perkembangan motorik serta sensorik anak.",
+    textWhite: true,
+  },
+];
+
+const ADVANTAGES = [
+  "Lingkungan Belajar yang Aman & Islami",
+  "Pengenalan Al-Qur'an & Hafalan Doa Harian (Metode Fun)",
+  "Nutrisi Sehat & Snack Halal Thayyib",
+  "Pembelajaran Berbasis Bermain (Play-based Learning)",
+  "Laporan Perkembangan Anak Rutin untuk Orang Tua",
+];
+
+const PROGRAMS = [
+  {
+    title: "Kelompok Bermain",
+    age: "2 – 3 Tahun",
+    desc: "Fokus pada sosialisasi dasar, stimulasi motorik kasar & halus, serta pengenalan kalimat thayyibah melalui permainan terbimbing.",
+    img: "https://images.unsplash.com/photo-1526634332515-d56c5fd16991?auto=format&fit=crop&w=600&q=80",
+  },
+  {
+    title: "PAUD / TK A",
+    age: "3 – 4 Tahun",
+    desc: "Mengembangkan kemandirian, kreativitas seni, adab islami sehari-hari, dan pengenalan huruf hijaiyah & alfabet secara interaktif.",
+    img: "https://images.unsplash.com/photo-1541692641319-981cc79ee10a?auto=format&fit=crop&w=600&q=80",
+  },
+  {
+    title: "PAUD / TK B",
+    age: "4 – 5 Tahun",
+    desc: "Persiapan menuju SD dengan metode menyenangkan (calistung dasar, tahfidz surat pendek, dan eksplorasi sains sederhana).",
+    img: "https://images.unsplash.com/photo-1571210862729-78a52d3779a2?auto=format&fit=crop&w=600&q=80",
+  },
+];
+
+const SCHEDULE = [
+  { time: "07.30", activity: "Sambut Hangat & Ikrar" },
+  { time: "08.00", activity: "Sholat Dhuha & Tahfidz" },
+  { time: "08.30", activity: "Sarapan & Snack Sehat" },
+  { time: "09.00", activity: "Kegiatan Inti / Belajar Tematik" },
+  { time: "10.00", activity: "Bermain Bebas & Motorik" },
+  { time: "11.00", activity: "Makan Siang & Persiapan Pulang" },
+];
+
+/* ------------------------------- Component ------------------------------- */
+
+export default function ASLAPaudLanding() {
+  const [menuOpen, setMenuOpen] = useState(false);
+
+  return (
+    <div className="min-h-screen bg-[#FDFBF7] text-slate-800 font-body overflow-x-hidden">
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Quicksand:wght@400;500;600;700&display=swap');
+        .font-display { font-family: 'Baloo 2', system-ui, sans-serif; }
+        .font-body { font-family: 'Quicksand', system-ui, sans-serif; }
+        .blob {
+          border-radius: 62% 38% 55% 45% / 48% 42% 58% 52%;
+        }
+        .blob-2 {
+          border-radius: 45% 55% 62% 38% / 55% 45% 55% 45%;
+        }
+      `}</style>
+
+      {/* ---------------- NAVBAR ---------------- */}
+      <header className="sticky top-0 z-50 bg-[#FDFBF7]/90 backdrop-blur-sm">
+        <div className="max-w-7xl mx-auto px-5 sm:px-8 py-4 flex items-center justify-between gap-4">
+          <div className="flex items-center gap-2 shrink-0">
+            <div className="w-11 h-11 rounded-full bg-orange-500 flex items-center justify-center shadow-sm">
+              <Sparkles className="w-6 h-6 text-white" strokeWidth={2.5} />
+            </div>
+            <span className="font-display font-bold text-lg sm:text-xl text-slate-800 leading-tight">
+              ASLA PAUD <span className="text-orange-500">ISLAMIC SCHOOL</span>
+            </span>
+          </div>
+
+          <nav className="hidden lg:flex items-center bg-sky-200 rounded-full px-3 py-2 gap-1 shadow-sm">
+            {NAV_LINKS.map((link) => (
+              <a
+                key={link.label}
+                href={link.href}
+                className="font-display font-semibold text-sm text-slate-700 px-4 py-2 rounded-full hover:bg-white/60 transition-all"
+              >
+                {link.label}
+              </a>
+            ))}
+          </nav>
+
+          <a
+            href="#ppdb"
+            className="hidden lg:inline-block bg-orange-500 text-white font-display font-bold text-sm px-6 py-3 rounded-full shadow-md hover:scale-105 hover:bg-orange-600 transition-all shrink-0"
+          >
+            Daftar Sekarang
+          </a>
+
+          <button
+            className="lg:hidden w-11 h-11 rounded-full bg-sky-200 flex items-center justify-center shrink-0"
+            onClick={() => setMenuOpen(!menuOpen)}
+            aria-label="Buka menu"
+          >
+            {menuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+          </button>
+        </div>
+
+        {menuOpen && (
+          <div className="lg:hidden px-5 pb-5 flex flex-col gap-2">
+            {NAV_LINKS.map((link) => (
+              <a
+                key={link.label}
+                href={link.href}
+                onClick={() => setMenuOpen(false)}
+                className="font-display font-semibold text-sm text-slate-700 bg-sky-200 px-4 py-3 rounded-2xl"
+              >
+                {link.label}
+              </a>
+            ))}
+            <a
+              href="#ppdb"
+              onClick={() => setMenuOpen(false)}
+              className="bg-orange-500 text-white font-display font-bold text-sm px-4 py-3 rounded-2xl text-center mt-1"
+            >
+              Daftar Sekarang
+            </a>
+          </div>
+        )}
+      </header>
+
+      {/* ---------------- HERO ---------------- */}
+      <section className="relative max-w-7xl mx-auto px-5 sm:px-8 pt-8 sm:pt-14 pb-16 sm:pb-24">
+        <DoodleCloud className="hidden md:block absolute -top-2 left-8 w-24 opacity-80" />
+        <DoodleSun className="hidden md:block absolute top-6 right-[38%] w-14" />
+
+        <div className="grid lg:grid-cols-2 gap-12 items-center">
+          <div className="relative z-10 text-center lg:text-left">
+            <div className="inline-flex items-center gap-2 bg-pink-100 text-pink-600 font-display font-semibold text-xs px-4 py-2 rounded-full mb-5">
+              <Star className="w-3.5 h-3.5 fill-pink-500 text-pink-500" />
+              PAUD & TK Islami Terpercaya
+            </div>
+            <h1 className="font-display font-extrabold text-4xl sm:text-5xl xl:text-6xl leading-[1.08] text-slate-800">
+              Membimbing dengan{" "}
+              <span className="text-orange-500">Cinta, Iman,</span> dan
+              Keceriaan Setiap Hari!
+            </h1>
+            <p className="mt-5 text-base sm:text-lg text-slate-600 max-w-lg mx-auto lg:mx-0">
+              Pendidikan usia dini yang berlandaskan nilai-nilai Islam, penuh
+              kehangatan, dan dirancang agar buah hati Anda tumbuh dengan
+              percaya diri.
+            </p>
+            <div className="mt-8 flex flex-wrap items-center justify-center lg:justify-start gap-3">
+              <a
+                href="#kontak"
+                className="bg-orange-500 text-white font-display font-bold px-7 py-3.5 rounded-full shadow-lg hover:scale-105 hover:bg-orange-600 transition-all"
+              >
+                Jadwalkan Kunjungan
+              </a>
+              <a
+                href="#ppdb"
+                className="bg-white border-2 border-orange-500 text-orange-500 font-display font-bold px-7 py-3.5 rounded-full hover:scale-105 hover:bg-orange-50 transition-all"
+              >
+                Info PPDB
+              </a>
+            </div>
+          </div>
+
+          <div className="relative flex justify-center lg:justify-end">
+            <DoodleHeart className="absolute -top-6 -left-4 w-14 z-20 rotate-[-12deg]" />
+            <DoodleStar className="absolute bottom-4 -right-2 w-12 z-20" color="#A3D3E9" />
+            <DoodleStar className="absolute top-1/3 -right-8 w-8 z-20" color="#F58220" />
+            <div className="blob w-72 h-72 sm:w-96 sm:h-96 overflow-hidden bg-sky-200 shadow-xl">
+              <img
+                src="https://images.unsplash.com/photo-1503454537195-1dcabb73ffb9?auto=format&fit=crop&w=900&q=80"
+                alt="Anak-anak belajar dengan bahagia"
+                className="w-full h-full object-cover"
+              />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ---------------- BANNER STATEMENT ---------------- */}
+      <section className="bg-sky-200/80 py-8">
+        <p className="max-w-3xl mx-auto px-6 text-center font-display font-bold text-lg sm:text-2xl text-slate-800 leading-snug">
+          "Pendidikan anak usia dini berkualitas yang memadukan nilai-nilai
+          adab Islami, kreativitas, dan keceriaan dalam lingkungan yang aman
+          dan nyaman."
+        </p>
+      </section>
+
+      {/* ---------------- MISSION & HIGHLIGHTS ---------------- */}
+      <section id="tentang" className="max-w-7xl mx-auto px-5 sm:px-8 py-16 sm:py-24">
+        <div className="text-center max-w-2xl mx-auto mb-12">
+          <h2 className="font-display font-extrabold text-3xl sm:text-4xl text-slate-800">
+            Visi & Filosofi Kami
+          </h2>
+          <p className="mt-4 text-slate-600">
+            Kami percaya bahwa setiap anak adalah amanah yang perlu dibimbing
+            dengan kasih sayang, keteladanan, dan nilai-nilai Islam sejak usia
+            dini, agar tumbuh menjadi pribadi yang berakhlak mulia dan penuh
+            percaya diri.
+          </p>
+        </div>
+
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {HIGHLIGHTS.map(({ icon: Icon, bg, title, desc, textWhite }) => (
+            <div
+              key={title}
+              className={`${bg} ${textWhite ? "text-white" : "text-slate-800"} rounded-3xl p-8 shadow-sm hover:scale-105 hover:shadow-lg transition-all`}
+            >
+              <div
+                className={`w-14 h-14 rounded-2xl flex items-center justify-center mb-5 ${
+                  textWhite ? "bg-white/25" : "bg-white/70"
+                }`}
+              >
+                <Icon className="w-7 h-7" strokeWidth={2} />
+              </div>
+              <h3 className="font-display font-bold text-xl mb-2">{title}</h3>
+              <p className={`text-sm ${textWhite ? "text-white/90" : "text-slate-700"}`}>
+                {desc}
+              </p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* ---------------- WHY CHOOSE US ---------------- */}
+      <section id="fasilitas" className="max-w-7xl mx-auto px-5 sm:px-8 py-8 sm:py-16">
+        <div className="grid lg:grid-cols-2 gap-14 items-center">
+          <div className="relative flex justify-center order-2 lg:order-1">
+            <DoodleSun className="absolute -top-6 left-6 w-12 z-20" />
+            <DoodleStar className="absolute bottom-2 right-4 w-10 z-20" color="#F58220" />
+            <div className="blob-2 w-64 h-64 sm:w-80 sm:h-80 bg-pink-200 overflow-hidden shadow-xl">
+              <img
+                src="https://images.unsplash.com/photo-1544776193-352d25ca82cd?auto=format&fit=crop&w=800&q=80"
+                alt="Anak tersenyum bahagia"
+                className="w-full h-full object-cover"
+              />
+            </div>
+          </div>
+
+          <div className="order-1 lg:order-2">
+            <h2 className="font-display font-extrabold text-3xl sm:text-4xl text-slate-800 mb-8">
+              Mengapa Memilih <span className="text-orange-500">ASLA PAUD?</span>
+            </h2>
+            <div className="flex flex-col gap-3">
+              {ADVANTAGES.map((item, i) => (
+                <div
+                  key={i}
+                  className="flex items-center gap-3 bg-sky-100 rounded-full pl-4 pr-5 py-3.5 hover:bg-sky-200 transition-all"
+                >
+                  <span className="w-7 h-7 rounded-full bg-sky-400 flex items-center justify-center shrink-0">
+                    <Check className="w-4 h-4 text-white" strokeWidth={3} />
+                  </span>
+                  <span className="font-medium text-sm sm:text-base text-slate-700">
+                    {item}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ---------------- PROGRAMS & CURRICULUM ---------------- */}
+      <section id="kurikulum" className="bg-orange-500 py-16 sm:py-24 mt-8">
+        <div className="max-w-7xl mx-auto px-5 sm:px-8">
+          <h2 className="font-display font-extrabold text-3xl sm:text-4xl text-white text-center mb-3">
+            Program & Kurikulum Kami
+          </h2>
+          <p className="text-orange-50 text-center max-w-xl mx-auto mb-12">
+            Tiga jenjang belajar yang dirancang sesuai tahap tumbuh kembang
+            anak usia dini.
+          </p>
+
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
+            {PROGRAMS.map((p) => (
+              <div
+                key={p.title}
+                className="rounded-3xl overflow-hidden bg-white shadow-lg hover:scale-105 transition-all"
+              >
+                <div className="h-48 overflow-hidden">
+                  <img src={p.img} alt={p.title} className="w-full h-full object-cover" />
+                </div>
+                <div className="p-6">
+                  <span className="inline-block bg-orange-100 text-orange-600 text-xs font-display font-bold px-3 py-1 rounded-full mb-3">
+                    {p.age}
+                  </span>
+                  <h3 className="font-display font-bold text-xl text-slate-800 mb-2">
+                    {p.title}
+                  </h3>
+                  <p className="text-sm text-slate-600">{p.desc}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ---------------- DAILY SCHEDULE ---------------- */}
+      <section id="jadwal" className="max-w-5xl mx-auto px-5 sm:px-8 py-16 sm:py-24">
+        <div className="text-center mb-12">
+          <h2 className="font-display font-extrabold text-3xl sm:text-4xl text-slate-800">
+            Jadwal Kegiatan Harian
+          </h2>
+          <p className="mt-3 text-slate-600">
+            Rutinitas seimbang antara ibadah, belajar, dan bermain.
+          </p>
+        </div>
+
+        <div className="bg-amber-50/60 rounded-3xl p-6 sm:p-10 shadow-sm">
+          <div className="flex flex-col gap-3">
+            {SCHEDULE.map((s, i) => (
+              <div
+                key={i}
+                className="flex items-center gap-4 bg-white rounded-2xl px-5 py-4 hover:scale-[1.02] transition-all"
+              >
+                <div className="bg-sky-200 font-display font-bold text-slate-800 rounded-full px-4 py-2 text-sm shrink-0">
+                  {s.time}
+                </div>
+                <div className="w-2 h-2 rounded-full bg-orange-400 shrink-0" />
+                <p className="font-medium text-slate-700 text-sm sm:text-base">
+                  {s.activity}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ---------------- FOOTER ---------------- */}
+      <footer id="kontak" className="bg-slate-800 text-white pt-16 pb-8">
+        <div className="max-w-7xl mx-auto px-5 sm:px-8 grid sm:grid-cols-2 lg:grid-cols-4 gap-10">
+          <div>
+            <div className="flex items-center gap-2 mb-4">
+              <div className="w-10 h-10 rounded-full bg-orange-500 flex items-center justify-center">
+                <Sparkles className="w-5 h-5 text-white" />
+              </div>
+              <span className="font-display font-bold text-lg">
+                ASLA PAUD <span className="text-orange-400">ISLAMIC SCHOOL</span>
+              </span>
+            </div>
+            <p className="text-slate-300 text-sm">
+              Membimbing dengan cinta, iman, dan keceriaan setiap hari.
+            </p>
+          </div>
+
+          <div>
+            <h4 className="font-display font-bold mb-4">Tautan</h4>
+            <ul className="flex flex-col gap-2 text-sm text-slate-300">
+              {NAV_LINKS.map((l) => (
+                <li key={l.label}>
+                  <a href={l.href} className="hover:text-orange-400 transition-all">
+                    {l.label}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <div>
+            <h4 className="font-display font-bold mb-4">Kontak</h4>
+            <ul className="flex flex-col gap-3 text-sm text-slate-300">
+              <li className="flex items-start gap-2">
+                <MapPin className="w-4 h-4 mt-0.5 shrink-0 text-orange-400" />
+                Jl. Melati Indah No. 12, Makassar, Sulawesi Selatan
+              </li>
+              <li className="flex items-center gap-2">
+                <Phone className="w-4 h-4 shrink-0 text-orange-400" />
+                +62 812-3456-7890 (WhatsApp)
+              </li>
+            </ul>
+          </div>
+
+          <div>
+            <h4 className="font-display font-bold mb-4">Ikuti Kami</h4>
+            <div className="flex gap-3">
+              <a href="#" className="w-10 h-10 rounded-full bg-slate-700 flex items-center justify-center hover:bg-orange-500 transition-all">
+                <Instagram className="w-4.5 h-4.5" />
+              </a>
+              <a href="#" className="w-10 h-10 rounded-full bg-slate-700 flex items-center justify-center hover:bg-orange-500 transition-all">
+                <Facebook className="w-4.5 h-4.5" />
+              </a>
+              <a href="#" className="w-10 h-10 rounded-full bg-slate-700 flex items-center justify-center hover:bg-orange-500 transition-all">
+                <Youtube className="w-4.5 h-4.5" />
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <div className="border-t border-slate-700 mt-12 pt-6 text-center text-xs text-slate-400">
+          © {new Date().getFullYear()} ASLA PAUD Islamic School. Seluruh hak cipta dilindungi.
+        </div>
+      </footer>
+    </div>
+  );
+}
